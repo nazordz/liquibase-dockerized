@@ -1,0 +1,30 @@
+version: '3.9'
+
+volumes:
+  postgres-lobo-data:
+
+services:
+  lobo-liquibase:
+    container_name: lobo-liquibase
+    image: liquibase/liquibase:4.7.1
+    command: --url="jdbc:postgresql://lobo-db:5432/postgres?currentSchema=public&user=postgres&password=postgres" --changeLogFile=changelog.xml update
+    volumes:
+      - ./config:/liquibase/changelog/
+      - ./scripts:/liquibase/scripts
+    networks:
+      - lobo-net
+  lobo-db:
+    container_name: lobo-db
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres-lobo-data:/var/lib/postgresql/data
+    networks:
+      - lobo-net
+networks:
+  lobo-net:    
+      
